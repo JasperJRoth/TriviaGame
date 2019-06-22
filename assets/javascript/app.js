@@ -204,7 +204,27 @@ function nextQuestion(){
         currentIndex++;
         displayQuestion();
     }else{
-        console.log("End Of Quiz");
+        clearQuestion();
+
+        $("#question").text("The Quiz Is Over");
+
+        $("#q1").text(`You got ${quizData.correct} out of ${quizData.questionNum} correct!`);
+
+        $("#q2").text("Try again?");
+
+        $("#q2").on("click", function(event){
+            quizData = {
+                category: undefined,
+                difficulty: undefined,
+                questionNum: undefined,
+                correct: 0,
+                incorrect: 0
+            };
+
+            currentIndex = 0;
+
+            getQuizData();
+        });
     }
 }
 
