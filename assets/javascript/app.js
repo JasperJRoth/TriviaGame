@@ -9,6 +9,8 @@ var quizData = {
 };
 var currentIndex = 0;
 var timeBetweenQuestions = 3000;
+var timerId;
+var timeLeft;
 var categoryList = [
     {
         title: "General Knowledge",
@@ -97,6 +99,7 @@ function displayQuestion(){
             element.text(q.correct_answer);
 
             element.on("click", function(){
+                stopTimer();
                 clearQuestion();
                 quizData.correct++;
 
@@ -113,6 +116,7 @@ function displayQuestion(){
             wrongQuestionsUsed++;
 
             element.on("click", function(){
+                stopTimer();
                 clearQuestion();
                 quizData.incorrect++;
 
@@ -174,6 +178,7 @@ function getQuizData(){
             element.on("click", function(event){
                 quizData.questionNum = $(event.target).data("qNum");
                 getQuestions();
+                startTimer();
             });
         });
     }
@@ -203,6 +208,7 @@ function nextQuestion(){
     if(currentIndex < questions.length - 1){
         currentIndex++;
         displayQuestion();
+        startTimer();
     }else{
         clearQuestion();
 
@@ -225,6 +231,40 @@ function nextQuestion(){
 
             getQuizData();
         });
+    }
+}
+
+function startTimer(){
+    if(!timerId){
+        timeLeft = 10;
+        timerId = setInterval(tick, 1000);
+        $("#timer").text(`Time remaining: ${timeLeft}`);
+    }
+}
+
+function stopTimer(){
+    clearInterval(timerId);
+    timerId = undefined;
+
+    $("#timer").text("");
+}
+
+function tick(){
+    timeLeft --;
+    $("#timer").text(`Time remaining: ${timeLeft}`);
+
+    if(timeLeft <= 0){
+        stopTimer();
+        clearQuestion();
+        quizData.incorrect++;
+
+        $("#question").text("You got that one wrong, ouch.");
+        $("#q1").text(`You've gotten ${quizData.correct} questions right!`);
+        $("#q2").text(`You've gotten ${quizData.incorrect} questions wrong.`);
+        $("#q3").text(`You have ${quizData.questionNum - (currentIndex + 1)} left to go!`);
+        $("#q4").text(`The correct answer was ${questions[currentIndex].correct_answer}.`);
+
+        setTimeout(nextQuestion, timeBetweenQuestions);
     }
 }
 
